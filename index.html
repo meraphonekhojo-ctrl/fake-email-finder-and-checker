@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TempMail Harvester Dashboard</title>
+    <title>TempMail Harvester & Validator</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -12,6 +12,7 @@
         <p>Advanced Disposable Email Detection & Aggregation</p>
     </header>
     <div class="container">
+        <!-- LEFT COLUMN -->
         <div class="col left-col">
             <!-- Checker -->
             <section class="card">
@@ -23,14 +24,14 @@
                 <div id="checker-result" class="result-box hidden"></div>
             </section>
 
-            <!-- Stats -->
+            <!-- Website & Domain Stats -->
             <section class="card">
                 <h2>📊 Website & Domain Stats</h2>
                 <input type="text" id="search-provider" class="search-input" placeholder="Search provider...">
                 <div id="stats-list" class="stats-list"></div>
             </section>
 
-            <!-- Export -->
+            <!-- Blocklist Export -->
             <section class="card">
                 <h2>📥 Blocklist Export</h2>
                 <div class="btn-group">
@@ -40,6 +41,8 @@
                 </div>
             </section>
         </div>
+
+        <!-- RIGHT COLUMN -->
         <div class="col right-col">
             <section class="card">
                 <div class="right-header">
@@ -52,7 +55,7 @@
                 </div>
                 <input type="text" id="search-emails" class="search-input" placeholder="Search by domain or email...">
                 <div id="accordion-container" class="accordion-container">
-                    <!-- Accordion Items Go Here -->
+                    <!-- Domain cards with emails injected via JS -->
                 </div>
             </section>
         </div>
