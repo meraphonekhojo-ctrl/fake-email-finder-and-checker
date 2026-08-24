@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TempMail Harvester</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📧</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>📧 TempMail Harvester</h1>
+            <p>Database of temporary, disposable, and throwaway email addresses.</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="stats-grid" id="stats-container">
+            <div class="stat-card">
+                <h3>Total Emails</h3>
+                <p class="stat-value" id="stat-total">-</p>
+            </div>
+            <div class="stat-card">
+                <h3>Providers</h3>
+                <p class="stat-value" id="stat-providers">-</p>
+            </div>
+            <div class="stat-card">
+                <h3>API Emails</h3>
+                <p class="stat-value" id="stat-api">-</p>
+            </div>
+            <div class="stat-card">
+                <h3>Domain Emails</h3>
+                <p class="stat-value" id="stat-domain">-</p>
+            </div>
+            <div class="stat-card">
+                <h3>Last Updated</h3>
+                <p class="stat-value text-small" id="stat-updated">-</p>
+            </div>
+        </section>
+
+        <section class="controls">
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="Search emails, providers, domains...">
+            </div>
+            <div class="filter-box">
+                <select id="method-filter">
+                    <option value="all">All Methods</option>
+                    <option value="api">API</option>
+                    <option value="domain">Domain</option>
+                </select>
+            </div>
+        </section>
+
+        <section class="table-container">
+            <table id="emails-table">
+                <thead>
+                    <tr>
+                        <th data-sort="index">#</th>
+                        <th data-sort="email">Email Address</th>
+                        <th data-sort="provider">Provider</th>
+                        <th data-sort="domain">Domain</th>
+                        <th data-sort="method">Method</th>
+                        <th data-sort="harvested_at">Harvested At</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    <!-- Data injected via JS -->
+                </tbody>
+            </table>
+            <div id="loading" class="loading">Loading data...</div>
+            <div id="no-results" class="no-results hidden">No emails found matching your criteria.</div>
+        </section>
+
+        <section class="pagination">
+            <button id="btn-prev" disabled>Previous</button>
+            <div id="page-info">Page <span id="current-page">1</span> of <span id="total-pages">1</span></div>
+            <button id="btn-next" disabled>Next</button>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>TempMail Harvester &bull; <a href="https://github.com" target="_blank" rel="noopener">GitHub</a></p>
+        </div>
+    </footer>
+
+    <div id="toast" class="toast">Copied to clipboard!</div>
+
+    <script src="script.js"></script>
+</body>
+</html>
