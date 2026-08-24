@@ -22,6 +22,7 @@ from scraper.utils import (
     merge_emails,
     save_to_csv,
     save_to_json,
+    export_domains
 )
 from scraper.providers import get_total_provider_count
 
@@ -37,6 +38,10 @@ def main():
 
     # Ensure output directories exist
     ensure_directories()
+    
+    # Export domains for blocklist and dashboard first
+    export_domains()
+    logger.info("Exported domain blocklists.")
 
     total_providers = get_total_provider_count()
     logger.info(f"Total providers configured: {total_providers}")

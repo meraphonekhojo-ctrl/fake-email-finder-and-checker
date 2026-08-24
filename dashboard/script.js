@@ -2,16 +2,37 @@ const ITEMS_PER_PAGE = 50;
 
 let rawData = [];
 let filteredData = [];
+let domainsSet = new Set();
+let allDomainsData = null;
 let currentPage = 1;
 let sortCol = 'index';
 let sortAsc = true;
 
 const elements = {
+    // Stats
     total: document.getElementById('stat-total'),
     providers: document.getElementById('stat-providers'),
-    api: document.getElementById('stat-api'),
-    domain: document.getElementById('stat-domain'),
+    domainsCount: document.getElementById('stat-domains-count'),
     updated: document.getElementById('stat-updated'),
+    
+    // Checker
+    emailInput: document.getElementById('email-check-input'),
+    btnCheck: document.getElementById('btn-check'),
+    checkerCard: document.getElementById('checker-card'),
+    checkResult: document.getElementById('check-result'),
+    resultIcon: document.getElementById('result-icon'),
+    resultTitle: document.getElementById('result-title'),
+    resultMessage: document.getElementById('result-message'),
+    
+    // Services
+    servicesGrid: document.getElementById('services-grid'),
+    
+    // Downloads
+    downloadTxt: document.getElementById('download-txt'),
+    downloadCsv: document.getElementById('download-csv'),
+    downloadJson: document.getElementById('download-json'),
+
+    // Table
     searchInput: document.getElementById('search-input'),
     methodFilter: document.getElementById('method-filter'),
     tableBody: document.getElementById('table-body'),
@@ -27,52 +48,154 @@ const elements = {
 
 async function init() {
     try {
-        const response = await fetch('data.json');
-        if (!response.ok) throw new Error('Network response was not ok');
-        const data = await response.json();
+        // Load Harvested Emails
+        const emailResponse = await fetch('data.json').catch(() => null);
+        let emailData = { emails: [], total_count: 0, providers_count: 0 };
+        if (emailResponse && emailResponse.ok) {
+            emailData = await emailResponse.json();
+        }
+
+        // Load Domain List
+        const domainResponse = await fetch('domains.json').catch(() => null);
+        let domainData = { domains: [], total_domains: 0, featured_services: {} };
+        if (domainResponse && domainResponse.ok) {
+            domainData = await domainResponse.json();
+        }
         
-        processData(data);
+        allDomainsData = domainData;
+        domainsSet = new Set((domainData.domains || []).map(d => d.toLowerCase()));
+
+        processData(emailData, domainData);
         setupEventListeners();
         render();
+        renderServices(domainData.featured_services);
+        setupDownloads();
+
     } catch (error) {
         console.error('Failed to load data:', error);
-        elements.loading.textContent = 'Failed to load data. Please make sure data.json exists and is valid JSON.';
+        elements.loading.textContent = 'Failed to load data. Please verify json files exist.';
     }
 }
 
-function processData(data) {
-    // Populate stats
-    elements.total.textContent = data.total_count || 0;
-    elements.providers.textContent = data.providers_count || 0;
+function processData(emailData, domainData) {
+    elements.total.textContent = emailData.total_count || 0;
+    elements.providers.textContent = emailData.providers_count || 0;
+    elements.domainsCount.textContent = domainData.total_domains || 0;
     
-    // Add index to emails and count methods
-    let apiCount = 0;
-    let domainCount = 0;
-    
-    rawData = (data.emails || []).map((item, index) => {
-        if (item.method === 'api') apiCount++;
-        else if (item.method === 'domain') domainCount++;
-        
-        return {
-            ...item,
-            index: index + 1
-        };
+    rawData = (emailData.emails || []).map((item, index) => {
+        return { ...item, index: index + 1 };
     });
     
-    elements.api.textContent = apiCount;
-    elements.domain.textContent = domainCount;
-    
-    if (data.last_updated) {
-        const date = new Date(data.last_updated);
+    if (emailData.last_updated) {
+        const date = new Date(emailData.last_updated);
+        elements.updated.textContent = date.toLocaleString();
+    } else if (domainData.last_updated) {
+        const date = new Date(domainData.last_updated);
         elements.updated.textContent = date.toLocaleString();
     }
     
     filteredData = [...rawData];
 }
 
+function renderServices(services) {
+    if (!services || Object.keys(services).length === 0) {
+        elements.servicesGrid.innerHTML = '<p>No services data available.</p>';
+        return;
+    }
+
+    elements.servicesGrid.innerHTML = '';
+    
+    for (const [key, service] of Object.entries(services)) {
+        const card = document.createElement('div');
+        card.className = 'service-card';
+        
+        let domainsHtml = '';
+        const limit = 3;
+        const domains = service.known_domains || [];
+        
+        for (let i = 0; i < Math.min(domains.length, limit); i++) {
+            domainsHtml += `<span class="domain-chip">${domains[i]}</span>`;
+        }
+        if (domains.length > limit) {
+            domainsHtml += `<span class="domain-chip">+${domains.length - limit} more</span>`;
+        }
+        
+        card.innerHTML = `
+            <div class="service-header">
+                <h3>${service.name}</h3>
+                <span class="service-badge">${service.category}</span>
+            </div>
+            <a href="${service.url}" target="_blank" rel="noopener" class="service-link">${service.url}</a>
+            <p class="service-desc">${service.description}</p>
+            <div class="service-footer">
+                ${domainsHtml}
+            </div>
+        `;
+        
+        elements.servicesGrid.appendChild(card);
+    }
+}
+
+function setupDownloads() {
+    // Generate TXT Blob from domainsSet
+    if (domainsSet.size > 0) {
+        const txtContent = Array.from(domainsSet).sort().join('\n');
+        const txtBlob = new Blob([txtContent], { type: 'text/plain' });
+        elements.downloadTxt.href = URL.createObjectURL(txtBlob);
+    }
+    
+    // Existing files can be downloaded directly, or we can generate them from memory
+}
+
+function checkEmail() {
+    const input = elements.emailInput.value.trim().toLowerCase();
+    if (!input) return;
+
+    let domainToCheck = input;
+    
+    // If it's an email, extract domain
+    if (input.includes('@')) {
+        domainToCheck = input.split('@')[1];
+    }
+    
+    const isFake = domainsSet.has(domainToCheck);
+    
+    elements.checkerCard.classList.remove('status-fake', 'status-safe');
+    elements.checkResult.classList.remove('hidden', 'result-fake', 'result-safe');
+    
+    if (isFake) {
+        elements.checkerCard.classList.add('status-fake');
+        elements.checkResult.classList.add('result-fake');
+        elements.resultIcon.textContent = '🚨';
+        elements.resultTitle.textContent = 'FAKE / DISPOSABLE DETECTED';
+        elements.resultTitle.style.color = 'var(--accent-red)';
+        elements.resultMessage.innerHTML = `The domain <strong>${domainToCheck}</strong> was found in our blocklist. This email is likely temporary or disposable.`;
+    } else {
+        elements.checkerCard.classList.add('status-safe');
+        elements.checkResult.classList.add('result-safe');
+        elements.resultIcon.textContent = '✅';
+        elements.resultTitle.textContent = 'CLEAN / NOT IN BLOCKLIST';
+        elements.resultTitle.style.color = 'var(--accent-green)';
+        elements.resultMessage.innerHTML = `The domain <strong>${domainToCheck}</strong> appears to be safe and is not in our known disposable database.`;
+    }
+}
+
 function setupEventListeners() {
+    // Checker Event Listeners
+    elements.btnCheck.addEventListener('click', checkEmail);
+    elements.emailInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') checkEmail();
+    });
+    elements.emailInput.addEventListener('input', () => {
+        if (!elements.emailInput.value.trim()) {
+            elements.checkResult.classList.add('hidden');
+            elements.checkerCard.classList.remove('status-fake', 'status-safe');
+        }
+    });
+
+    // Table Filters
     let debounceTimer;
-    elements.searchInput.addEventListener('input', (e) => {
+    elements.searchInput.addEventListener('input', () => {
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => {
             applyFilters();
@@ -101,6 +224,7 @@ function setupEventListeners() {
     elements.headers.forEach(th => {
         th.addEventListener('click', () => {
             const col = th.getAttribute('data-sort');
+            if (!col) return;
             if (sortCol === col) {
                 sortAsc = !sortAsc;
             } else {
@@ -153,6 +277,7 @@ function sortData() {
 
 function updateSortIndicators() {
     elements.headers.forEach(th => {
+        if(!th.getAttribute('data-sort')) return;
         th.textContent = th.textContent.replace(' ↑', '').replace(' ↓', '');
         if (th.getAttribute('data-sort') === sortCol) {
             th.textContent += sortAsc ? ' ↑' : ' ↓';

@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TempMail Harvester</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📧</text></svg>">
+    <title>TempMail Harvester & Fake Email Checker</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -13,38 +13,80 @@
 <body>
     <header class="header">
         <div class="container">
-            <h1>📧 TempMail Harvester</h1>
-            <p>Database of temporary, disposable, and throwaway email addresses.</p>
+            <h1>🛡️ Fake Email Checker & Domain Blocklist</h1>
+            <p>Instantly verify if an email belongs to a disposable or temporary mail service.</p>
         </div>
     </header>
 
     <main class="container">
-        <section class="stats-grid" id="stats-container">
-            <div class="stat-card">
-                <h3>Total Emails</h3>
-                <p class="stat-value" id="stat-total">-</p>
+        <!-- Instant Fake Email Checker -->
+        <section class="checker-section">
+            <div class="checker-card" id="checker-card">
+                <h2>Instant Fake Email Checker</h2>
+                <div class="input-group">
+                    <input type="text" id="email-check-input" placeholder="Enter an email (e.g. test@yopmail.com) to instantly check..." autocomplete="off">
+                    <button id="btn-check" class="btn-primary">Check</button>
+                </div>
+                <div id="check-result" class="check-result hidden">
+                    <div class="result-icon" id="result-icon"></div>
+                    <div class="result-details">
+                        <h3 id="result-title"></h3>
+                        <p id="result-message"></p>
+                    </div>
+                </div>
             </div>
-            <div class="stat-card">
-                <h3>Providers</h3>
-                <p class="stat-value" id="stat-providers">-</p>
+        </section>
+
+        <!-- Quick Blocklist Export -->
+        <section class="export-section">
+            <div class="export-card">
+                <h2>Quick Blocklist Export</h2>
+                <p>Download the latest list of 250+ known disposable domains to protect your application.</p>
+                <div class="export-buttons">
+                    <a id="download-txt" class="btn-export" href="#" download="disposable_domains.txt">Download TXT</a>
+                    <a id="download-csv" class="btn-export" href="#" download="emails.csv">Download Emails (CSV)</a>
+                    <a id="download-json" class="btn-export" href="#" download="domains.json">Download Domains (JSON)</a>
+                </div>
             </div>
-            <div class="stat-card">
-                <h3>API Emails</h3>
-                <p class="stat-value" id="stat-api">-</p>
+        </section>
+
+        <!-- Targeted Fake Email Services Directory -->
+        <section class="services-section">
+            <h2>Targeted Fake Email Services Directory</h2>
+            <p>Our blocklist targets over 23 prominent temporary email providers and their subdomains.</p>
+            <div class="services-grid" id="services-grid">
+                <!-- Injected via JS -->
             </div>
-            <div class="stat-card">
-                <h3>Domain Emails</h3>
-                <p class="stat-value" id="stat-domain">-</p>
-            </div>
-            <div class="stat-card">
-                <h3>Last Updated</h3>
-                <p class="stat-value text-small" id="stat-updated">-</p>
+        </section>
+
+        <hr class="divider">
+
+        <!-- Harvested Emails Table (Existing) -->
+        <section class="stats-section">
+            <h2>Database Overview</h2>
+            <div class="stats-grid" id="stats-container">
+                <div class="stat-card">
+                    <h3>Total Emails</h3>
+                    <p class="stat-value" id="stat-total">-</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Providers</h3>
+                    <p class="stat-value" id="stat-providers">-</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Domains Blocked</h3>
+                    <p class="stat-value" id="stat-domains-count">-</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Last Updated</h3>
+                    <p class="stat-value text-small" id="stat-updated">-</p>
+                </div>
             </div>
         </section>
 
         <section class="controls">
             <div class="search-box">
-                <input type="text" id="search-input" placeholder="Search emails, providers, domains...">
+                <input type="text" id="search-input" placeholder="Search harvested emails...">
             </div>
             <div class="filter-box">
                 <select id="method-filter">
@@ -85,7 +127,7 @@
 
     <footer class="footer">
         <div class="container">
-            <p>TempMail Harvester &bull; <a href="https://github.com" target="_blank" rel="noopener">GitHub</a></p>
+            <p>Fake Email Checker &bull; TempMail Harvester</p>
         </div>
     </footer>
 
