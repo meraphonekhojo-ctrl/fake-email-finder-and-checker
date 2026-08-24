@@ -3,84 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instant Fake Email Detector & Checker</title>
+    <title>TempMail Harvester Dashboard</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
-        <div class="container">
-            <h1>⚡ Instant Fake Email Detector & Checker</h1>
-            <p>Real-time validation for disposable emails and domains</p>
-        </div>
+        <h1><span class="icon">🛡️</span> TempMail Harvester & Validator</h1>
+        <p>Advanced Disposable Email Detection & Aggregation</p>
     </header>
-    
-    <main class="container">
-        <section class="search-section">
-            <div class="search-box">
-                <input type="text" id="search-input" placeholder="Enter email address or domain to check...">
-                <button id="search-btn">Check</button>
-            </div>
-            <div id="search-result" class="result-message"></div>
-        </section>
+    <div class="container">
+        <div class="col left-col">
+            <!-- Checker -->
+            <section class="card">
+                <h2>⚡ Instant Fake Email Checker</h2>
+                <div class="input-group">
+                    <input type="text" id="checker-input" placeholder="Enter email or domain...">
+                    <button id="btn-check">Validate</button>
+                </div>
+                <div id="checker-result" class="result-box hidden"></div>
+            </section>
 
-        <section class="stats-section">
-            <div class="stat-card">
-                <h3>Total Domains</h3>
-                <p id="stat-total">0</p>
-            </div>
-            <div class="stat-card">
-                <h3>Providers Checked</h3>
-                <p id="stat-providers">23</p>
-            </div>
-            <div class="stat-card">
-                <h3>API Providers</h3>
-                <p id="stat-api">15</p>
-            </div>
-            <div class="stat-card">
-                <h3>Last Updated</h3>
-                <p id="stat-updated">-</p>
-            </div>
-        </section>
+            <!-- Stats -->
+            <section class="card">
+                <h2>📊 Website & Domain Stats</h2>
+                <input type="text" id="search-provider" class="search-input" placeholder="Search provider...">
+                <div id="stats-list" class="stats-list"></div>
+            </section>
 
-        <section class="export-section">
-            <h2>Export Blocklist</h2>
-            <div class="export-buttons">
-                <a href="data/disposable_domains.txt" class="btn" download>Download TXT</a>
-                <a href="data/disposable_domains.json" class="btn" download>Download JSON</a>
-                <a href="data/emails.csv" class="btn" download>Download CSV</a>
-            </div>
-        </section>
-
-        <section class="providers-section">
-            <h2>Featured Providers</h2>
-            <div class="provider-grid">
-                <!-- Popular providers will be inserted here -->
-            </div>
-        </section>
-
-        <section class="directory-section">
-            <h2>Domain Directory</h2>
-            <div class="table-container">
-                <table id="domain-table">
-                    <thead>
-                        <tr>
-                            <th>Domain</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="domain-table-body">
-                        <!-- Data will be inserted here -->
-                    </tbody>
-                </table>
-            </div>
-            <div class="pagination">
-                <button id="prev-page">Previous</button>
-                <span id="page-info">Page 1</span>
-                <button id="next-page">Next</button>
-            </div>
-        </section>
-    </main>
-
+            <!-- Export -->
+            <section class="card">
+                <h2>📥 Blocklist Export</h2>
+                <div class="btn-group">
+                    <button id="btn-export-txt">TXT Blocklist</button>
+                    <button id="btn-export-csv">CSV Export</button>
+                    <button id="btn-export-json">JSON Export</button>
+                </div>
+            </section>
+        </div>
+        <div class="col right-col">
+            <section class="card">
+                <div class="right-header">
+                    <h2>📡 Live Harvested Emails & Instant Generator</h2>
+                    <div class="action-bar">
+                        <button id="btn-generate" class="btn-primary">⚡ Generate Instant Fake Email</button>
+                        <button id="btn-copy-emails">📋 Copy All Emails</button>
+                        <button id="btn-copy-domains">📋 Copy All Domains</button>
+                    </div>
+                </div>
+                <input type="text" id="search-emails" class="search-input" placeholder="Search by domain or email...">
+                <div id="accordion-container" class="accordion-container">
+                    <!-- Accordion Items Go Here -->
+                </div>
+            </section>
+        </div>
+    </div>
+    <div id="toast" class="toast"></div>
     <script src="script.js"></script>
 </body>
 </html>

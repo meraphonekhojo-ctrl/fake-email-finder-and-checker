@@ -1,129 +1,178 @@
-let allDomains = [];
-const itemsPerPage = 50;
-let currentPage = 1;
+let domainsMap = new Map();
+let emailsData = [];
+let providersMap = new Map();
 
-const featuredProviders = [
-    'fake-email.pro', 'tempmail.co.uk', 'armyspy.com', 'cuvox.de', 'dayrep.com',
-    'einrot.com', 'flddf.com', 'gustr.com', 'jourrapide.com', 'rhyta.com',
-    'superrito.com', 'teleworm.us', 'anonymmail.net', 'temp-mail.org', 'smailpro.com',
-    'trash-mail.com', 'rcpt.at', 'fakeemail.net', 'inxt.me', 'internxt.com',
-    'maildrop.cc', 'disposablemail.com', 'emailondeck.com', 'temp-mail.io', 'openinbox.io',
-    'mailsac.com', 'msr.sh', 'yopmail.com', 'cool.fr.nf', 'tempail.com', 'mails.org', 'adguard.com'
-];
-
-document.addEventListener('DOMContentLoaded', async () => {
-    await loadData();
-    setupSearch();
-    setupPagination();
-    renderFeaturedProviders();
-});
-
-async function loadData() {
+async function init() {
     try {
-        const response = await fetch('data.json');
-        const data = await response.json();
-        
-        allDomains = data.domains || [];
-        
-        // Update stats
-        if (data.stats) {
-            document.getElementById('stat-total').textContent = data.stats.total || allDomains.length;
-            document.getElementById('stat-providers').textContent = data.stats.providers || '-';
-            document.getElementById('stat-api').textContent = data.stats.api_providers || '-';
-            document.getElementById('stat-updated').textContent = new Date(data.stats.last_updated).toLocaleDateString() || '-';
-        }
-        
-        renderTable();
-    } catch (error) {
-        console.error('Error loading data:', error);
-        document.getElementById('domain-table-body').innerHTML = '<tr><td colspan="2">Failed to load data. Please make sure data.json exists and is valid JSON.</td></tr>';
+        const [domRes, dataRes] = await Promise.all([
+            fetch('./domains.json'),
+            fetch('./data.json')
+        ]);
+        const domData = await domRes.json();
+        emailsData = await dataRes.json();
+
+        domData.forEach(d => {
+            domainsMap.set(d.domain, d.provider);
+            providersMap.set(d.provider, (providersMap.get(d.provider) || 0) + 1);
+        });
+
+        renderStats();
+        renderAccordion();
+    } catch (e) {
+        console.error("Failed to load data:", e);
     }
 }
 
-function renderTable() {
-    const tbody = document.getElementById('domain-table-body');
-    tbody.innerHTML = '';
+function renderStats(filter = "") {
+    const list = document.getElementById('stats-list');
+    list.innerHTML = '';
+    const sorted = [...providersMap.entries()].sort((a,b) => b[1] - a[1]);
     
-    const start = (currentPage - 1) * itemsPerPage;
-    const end = start + itemsPerPage;
-    const pageDomains = allDomains.slice(start, end);
-    
-    pageDomains.forEach(domain => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${domain}</td>
-            <td><button class="copy-btn" onclick="copyText('${domain}')">Copy</button></td>
-        `;
-        tbody.appendChild(tr);
-    });
-    
-    document.getElementById('page-info').textContent = `Page ${currentPage} of ${Math.ceil(allDomains.length / itemsPerPage) || 1}`;
-    
-    document.getElementById('prev-page').disabled = currentPage === 1;
-    document.getElementById('next-page').disabled = currentPage === Math.ceil(allDomains.length / itemsPerPage) || allDomains.length === 0;
-}
-
-function setupPagination() {
-    document.getElementById('prev-page').addEventListener('click', () => {
-        if (currentPage > 1) {
-            currentPage--;
-            renderTable();
-        }
-    });
-    
-    document.getElementById('next-page').addEventListener('click', () => {
-        if (currentPage < Math.ceil(allDomains.length / itemsPerPage)) {
-            currentPage++;
-            renderTable();
-        }
-    });
-}
-
-function setupSearch() {
-    const input = document.getElementById('search-input');
-    const btn = document.getElementById('search-btn');
-    const resultDiv = document.getElementById('search-result');
-    
-    const checkEmail = () => {
-        const query = input.value.trim().toLowerCase();
-        if (!query) return;
-        
-        let domainToCheck = query;
-        if (query.includes('@')) {
-            domainToCheck = query.split('@')[1];
-        }
-        
-        const isDisposable = allDomains.includes(domainToCheck);
-        
-        resultDiv.className = 'result-message ' + (isDisposable ? 'disposable' : 'safe');
-        resultDiv.textContent = isDisposable 
-            ? `⚠️ WARNING: ${domainToCheck} is a known disposable/fake email domain!`
-            : `✅ SAFE: ${domainToCheck} is not in our disposable domain database.`;
-    };
-    
-    btn.addEventListener('click', checkEmail);
-    input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') checkEmail();
-    });
-}
-
-function renderFeaturedProviders() {
-    const grid = document.querySelector('.provider-grid');
-    grid.innerHTML = '';
-    
-    // Only show up to 24 featured providers
-    featuredProviders.slice(0, 24).forEach(provider => {
+    sorted.forEach(([provider, count]) => {
+        if (filter && !provider.toLowerCase().includes(filter.toLowerCase())) return;
         const div = document.createElement('div');
-        div.className = 'provider-card';
-        div.textContent = provider;
-        grid.appendChild(div);
+        div.className = 'stat-item';
+        div.innerHTML = `<span>${provider}</span> <span class="badge count">${count} domains</span>`;
+        list.appendChild(div);
     });
 }
 
-function copyText(text) {
-    navigator.clipboard.writeText(text).then(() => {
-        alert('Copied to clipboard!');
-    }).catch(err => {
-        console.error('Failed to copy:', err);
+document.getElementById('search-provider').addEventListener('input', (e) => renderStats(e.target.value));
+
+function renderAccordion(filterQuery = "") {
+    const container = document.getElementById('accordion-container');
+    container.innerHTML = '';
+
+    const grouped = {};
+    emailsData.forEach(e => {
+        if (filterQuery && !e.email.toLowerCase().includes(filterQuery.toLowerCase()) && !e.domain.toLowerCase().includes(filterQuery.toLowerCase())) return;
+        if (!grouped[e.domain]) grouped[e.domain] = [];
+        grouped[e.domain].push(e);
+    });
+
+    const sortedDomains = Object.keys(grouped).sort((a, b) => grouped[b].length - grouped[a].length);
+
+    sortedDomains.forEach(domain => {
+        const emails = grouped[domain];
+        const provider = domainsMap.get(domain) || 'Unknown';
+        const details = document.createElement('details');
+        details.className = 'domain-card';
+
+        const summary = document.createElement('summary');
+        summary.innerHTML = `
+            <div class="summary-content">
+                <span class="domain-name">${domain}</span>
+                <div class="badges">
+                    <span class="badge count">${emails.length} emails</span>
+                    <span class="badge provider">Source: ${provider}</span>
+                </div>
+            </div>
+        `;
+        details.appendChild(summary);
+
+        const ul = document.createElement('ul');
+        ul.className = 'email-list';
+        emails.forEach(e => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <span class="email-text">${e.email}</span>
+                <button class="btn-copy-small" onclick="copyText('${e.email}')">Copy</button>
+            `;
+            ul.appendChild(li);
+        });
+        details.appendChild(ul);
+        container.appendChild(details);
     });
 }
+
+document.getElementById('search-emails').addEventListener('input', (e) => renderAccordion(e.target.value));
+
+// Checker
+document.getElementById('btn-check').addEventListener('click', () => {
+    const input = document.getElementById('checker-input').value.trim().toLowerCase();
+    if (!input) return;
+
+    let domain = input;
+    if (input.includes('@')) {
+        domain = input.split('@')[1];
+    }
+
+    const resBox = document.getElementById('checker-result');
+    resBox.classList.remove('hidden', 'danger', 'success');
+
+    if (domainsMap.has(domain)) {
+        const provider = domainsMap.get(domain);
+        resBox.classList.add('danger');
+        resBox.innerHTML = `🚨 <strong>FAKE / DISPOSABLE EMAIL DETECTED</strong><br>Provider: ${provider}<br>Risk Score: 100%<br>Domain: ${domain}`;
+    } else {
+        resBox.classList.add('success');
+        resBox.innerHTML = `🟢 <strong>CLEAN / LEGITIMATE EMAIL</strong><br>No disposable domain matched.<br>Risk Score: 0%<br>Domain: ${domain}`;
+    }
+});
+
+window.copyText = function(text) {
+    navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard!'));
+};
+
+function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// Generate Button
+document.getElementById('btn-generate').addEventListener('click', () => {
+    const domainsArray = Array.from(domainsMap.keys());
+    if (domainsArray.length === 0) return;
+    const randomDomain = domainsArray[Math.floor(Math.random() * domainsArray.length)];
+    const provider = domainsMap.get(randomDomain);
+    const randomPrefix = Math.random().toString(36).substring(2, 10);
+    const newEmail = `${randomPrefix}@${randomDomain}`;
+
+    emailsData.unshift({ email: newEmail, domain: randomDomain, provider });
+    showToast(`Generated: ${newEmail}`);
+    
+    renderAccordion(document.getElementById('search-emails').value);
+    
+    const firstDetails = document.querySelector('.domain-card');
+    if (firstDetails) firstDetails.open = true;
+});
+
+// Bulk Copy
+document.getElementById('btn-copy-emails').addEventListener('click', () => {
+    const text = emailsData.map(e => e.email).join('\n');
+    navigator.clipboard.writeText(text).then(() => showToast(`${emailsData.length} emails copied!`));
+});
+
+document.getElementById('btn-copy-domains').addEventListener('click', () => {
+    const unique = [...new Set(emailsData.map(e => e.domain))];
+    navigator.clipboard.writeText(unique.join('\n')).then(() => showToast(`${unique.length} domains copied!`));
+});
+
+// Export Buttons
+document.getElementById('btn-export-txt').addEventListener('click', () => {
+    const text = Array.from(domainsMap.keys()).join('\n');
+    downloadBlob(text, 'blocklist.txt', 'text/plain');
+});
+document.getElementById('btn-export-csv').addEventListener('click', () => {
+    const csv = "Domain,Provider\n" + Array.from(domainsMap.entries()).map(e => `${e[0]},${e[1]}`).join('\n');
+    downloadBlob(csv, 'blocklist.csv', 'text/csv');
+});
+document.getElementById('btn-export-json').addEventListener('click', () => {
+    const jsonStr = JSON.stringify(Array.from(domainsMap.entries()).map(e => ({domain: e[0], provider: e[1]})), null, 2);
+    downloadBlob(jsonStr, 'blocklist.json', 'application/json');
+});
+
+function downloadBlob(content, fileName, contentType) {
+    const blob = new Blob([content], { type: contentType });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast(`Exported ${fileName}`);
+}
+
+init();

@@ -3,136 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TempMail Harvester & Fake Email Checker</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>TempMail Harvester Dashboard</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header class="header">
-        <div class="container">
-            <h1>🛡️ Fake Email Checker & Domain Blocklist</h1>
-            <p>Instantly verify if an email belongs to a disposable or temporary mail service.</p>
-        </div>
+    <header>
+        <h1><span class="icon">🛡️</span> TempMail Harvester & Validator</h1>
+        <p>Advanced Disposable Email Detection & Aggregation</p>
     </header>
-
-    <main class="container">
-        <!-- Instant Fake Email Checker -->
-        <section class="checker-section">
-            <div class="checker-card" id="checker-card">
-                <h2>Instant Fake Email Checker</h2>
+    <div class="container">
+        <div class="col left-col">
+            <!-- Checker -->
+            <section class="card">
+                <h2>⚡ Instant Fake Email Checker</h2>
                 <div class="input-group">
-                    <input type="text" id="email-check-input" placeholder="Enter an email (e.g. test@yopmail.com) to instantly check..." autocomplete="off">
-                    <button id="btn-check" class="btn-primary">Check</button>
+                    <input type="text" id="checker-input" placeholder="Enter email or domain...">
+                    <button id="btn-check">Validate</button>
                 </div>
-                <div id="check-result" class="check-result hidden">
-                    <div class="result-icon" id="result-icon"></div>
-                    <div class="result-details">
-                        <h3 id="result-title"></h3>
-                        <p id="result-message"></p>
+                <div id="checker-result" class="result-box hidden"></div>
+            </section>
+
+            <!-- Stats -->
+            <section class="card">
+                <h2>📊 Website & Domain Stats</h2>
+                <input type="text" id="search-provider" class="search-input" placeholder="Search provider...">
+                <div id="stats-list" class="stats-list"></div>
+            </section>
+
+            <!-- Export -->
+            <section class="card">
+                <h2>📥 Blocklist Export</h2>
+                <div class="btn-group">
+                    <button id="btn-export-txt">TXT Blocklist</button>
+                    <button id="btn-export-csv">CSV Export</button>
+                    <button id="btn-export-json">JSON Export</button>
+                </div>
+            </section>
+        </div>
+        <div class="col right-col">
+            <section class="card">
+                <div class="right-header">
+                    <h2>📡 Live Harvested Emails & Instant Generator</h2>
+                    <div class="action-bar">
+                        <button id="btn-generate" class="btn-primary">⚡ Generate Instant Fake Email</button>
+                        <button id="btn-copy-emails">📋 Copy All Emails</button>
+                        <button id="btn-copy-domains">📋 Copy All Domains</button>
                     </div>
                 </div>
-            </div>
-        </section>
-
-        <!-- Quick Blocklist Export -->
-        <section class="export-section">
-            <div class="export-card">
-                <h2>Quick Blocklist Export</h2>
-                <p>Download the latest list of 250+ known disposable domains to protect your application.</p>
-                <div class="export-buttons">
-                    <a id="download-txt" class="btn-export" href="#" download="disposable_domains.txt">Download TXT</a>
-                    <a id="download-csv" class="btn-export" href="#" download="emails.csv">Download Emails (CSV)</a>
-                    <a id="download-json" class="btn-export" href="#" download="domains.json">Download Domains (JSON)</a>
+                <input type="text" id="search-emails" class="search-input" placeholder="Search by domain or email...">
+                <div id="accordion-container" class="accordion-container">
+                    <!-- Accordion Items Go Here -->
                 </div>
-            </div>
-        </section>
-
-        <!-- Targeted Fake Email Services Directory -->
-        <section class="services-section">
-            <h2>Targeted Fake Email Services Directory</h2>
-            <p>Our blocklist targets over 23 prominent temporary email providers and their subdomains.</p>
-            <div class="services-grid" id="services-grid">
-                <!-- Injected via JS -->
-            </div>
-        </section>
-
-        <hr class="divider">
-
-        <!-- Harvested Emails Table (Existing) -->
-        <section class="stats-section">
-            <h2>Database Overview</h2>
-            <div class="stats-grid" id="stats-container">
-                <div class="stat-card">
-                    <h3>Total Emails</h3>
-                    <p class="stat-value" id="stat-total">-</p>
-                </div>
-                <div class="stat-card">
-                    <h3>Providers</h3>
-                    <p class="stat-value" id="stat-providers">-</p>
-                </div>
-                <div class="stat-card">
-                    <h3>Domains Blocked</h3>
-                    <p class="stat-value" id="stat-domains-count">-</p>
-                </div>
-                <div class="stat-card">
-                    <h3>Last Updated</h3>
-                    <p class="stat-value text-small" id="stat-updated">-</p>
-                </div>
-            </div>
-        </section>
-
-        <section class="controls">
-            <div class="search-box">
-                <input type="text" id="search-input" placeholder="Search harvested emails...">
-            </div>
-            <div class="filter-box">
-                <select id="method-filter">
-                    <option value="all">All Methods</option>
-                    <option value="api">API</option>
-                    <option value="domain">Domain</option>
-                </select>
-            </div>
-        </section>
-
-        <section class="table-container">
-            <table id="emails-table">
-                <thead>
-                    <tr>
-                        <th data-sort="index">#</th>
-                        <th data-sort="email">Email Address</th>
-                        <th data-sort="provider">Provider</th>
-                        <th data-sort="domain">Domain</th>
-                        <th data-sort="method">Method</th>
-                        <th data-sort="harvested_at">Harvested At</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="table-body">
-                    <!-- Data injected via JS -->
-                </tbody>
-            </table>
-            <div id="loading" class="loading">Loading data...</div>
-            <div id="no-results" class="no-results hidden">No emails found matching your criteria.</div>
-        </section>
-
-        <section class="pagination">
-            <button id="btn-prev" disabled>Previous</button>
-            <div id="page-info">Page <span id="current-page">1</span> of <span id="total-pages">1</span></div>
-            <button id="btn-next" disabled>Next</button>
-        </section>
-    </main>
-
-    <footer class="footer">
-        <div class="container">
-            <p>Fake Email Checker &bull; TempMail Harvester</p>
+            </section>
         </div>
-    </footer>
-
-    <div id="toast" class="toast">Copied to clipboard!</div>
-
+    </div>
+    <div id="toast" class="toast"></div>
     <script src="script.js"></script>
 </body>
 </html>
