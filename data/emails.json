@@ -1,6 +1,22 @@
-{
-  "last_updated": "",
-  "total_count": 0,
-  "providers_count": 0,
-  "emails": []
-}
+[
+    {
+        "email": "test@10mail.org",
+        "domain": "10mail.org"
+    },
+    {
+        "email": "test@10minutemail.com",
+        "domain": "10minutemail.com"
+    },
+    {
+        "email": "test@10minutemail.net",
+        "domain": "10minutemail.net"
+    },
+    {
+        "email": "test@10minutemail.org",
+        "domain": "10minutemail.org"
+    },
+    {
+        "email": "test@adguard.com",
+        "domain": "adguard.com"
+    }
+]

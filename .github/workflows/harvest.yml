@@ -1,8 +1,8 @@
-name: "TempMail Harvester - Daily Harvest"
+name: Harvest Domains
 
 on:
   schedule:
-    - cron: '0 2 * * *'
+    - cron: '0 0 * * *'
   workflow_dispatch:
 
 permissions:
@@ -11,34 +11,21 @@ permissions:
 jobs:
   harvest:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          token: ${{ github.token }}
-
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-          cache: 'pip'
-
-      - name: Install Dependencies
-        run: pip install -r requirements.txt
-
-      - name: Run TempMail Harvester
-        run: python -m scraper.main
-
-      - name: Commit and Push Results
+          python-version: '3.x'
+          
+      - name: Run Harvester
+        run: python scraper/main.py
+        
+      - name: Commit Changes
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/ dashboard/
-          if git diff --staged --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "🤖 Auto-harvest: $(date -u '+%Y-%m-%d %H:%M UTC')"
-            git push
-          fi
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git commit -m "chore: Auto update disposable domains" || echo "No changes to commit"
+          git push

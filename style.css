@@ -1,0 +1,217 @@
+:root {
+    --bg-color: #121212;
+    --card-bg: #1e1e1e;
+    --text-primary: #ffffff;
+    --text-secondary: #b3b3b3;
+    --accent: #bb86fc;
+    --accent-hover: #9965f4;
+    --border: #333333;
+    --danger: #cf6679;
+    --success: #03dac6;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+header {
+    background-color: var(--card-bg);
+    padding: 30px 0;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 30px;
+}
+
+header h1 {
+    color: var(--accent);
+    margin-bottom: 10px;
+}
+
+header p {
+    color: var(--text-secondary);
+}
+
+section {
+    margin-bottom: 40px;
+}
+
+/* Search Box */
+.search-box {
+    display: flex;
+    gap: 10px;
+    max-width: 600px;
+    margin: 0 auto 20px;
+}
+
+#search-input {
+    flex: 1;
+    padding: 15px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background-color: var(--card-bg);
+    color: var(--text-primary);
+    font-size: 16px;
+}
+
+#search-input:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+button, .btn {
+    padding: 15px 30px;
+    background-color: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    text-decoration: none;
+    display: inline-block;
+}
+
+button:hover, .btn:hover {
+    background-color: var(--accent-hover);
+}
+
+.result-message {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 15px;
+    border-radius: 8px;
+    display: none;
+}
+
+.result-message.disposable {
+    background-color: rgba(207, 102, 121, 0.2);
+    color: var(--danger);
+    border: 1px solid var(--danger);
+    display: block;
+}
+
+.result-message.safe {
+    background-color: rgba(3, 218, 198, 0.2);
+    color: var(--success);
+    border: 1px solid var(--success);
+    display: block;
+}
+
+/* Stats */
+.stats-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.stat-card {
+    background-color: var(--card-bg);
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid var(--border);
+}
+
+.stat-card h3 {
+    color: var(--text-secondary);
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+
+.stat-card p {
+    font-size: 32px;
+    font-weight: bold;
+    color: var(--accent);
+}
+
+/* Exports */
+.export-buttons {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+/* Provider Grid */
+.provider-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+.provider-card {
+    background-color: var(--card-bg);
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid var(--border);
+    font-size: 14px;
+}
+
+/* Table */
+.table-container {
+    overflow-x: auto;
+    background-color: var(--card-bg);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
+th {
+    background-color: rgba(0,0,0,0.2);
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.copy-btn {
+    padding: 5px 10px;
+    font-size: 12px;
+    background-color: #333;
+    color: var(--text-primary);
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.pagination button {
+    padding: 10px 20px;
+}
+
+.pagination button:disabled {
+    background-color: #333;
+    color: #666;
+    cursor: not-allowed;
+}

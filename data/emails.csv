@@ -1,1 +1,11 @@
-email,provider,domain,method,harvested_at
+email,domain
+test@10mail.org,10mail.org
+test@10minutemail.com,10minutemail.com
+test@10minutemail.net,10minutemail.net
+test@10minutemail.org,10minutemail.org
+test@adguard.com,adguard.com
+test@anonymmail.net,anonymmail.net
+test@armyspy.com,armyspy.com
+test@cool.fr.nf,cool.fr.nf
+test@cuvox.de,cuvox.de
+test@dayrep.com,dayrep.com

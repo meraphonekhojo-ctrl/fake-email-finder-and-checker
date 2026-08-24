@@ -1,21 +1,13 @@
 import os
+from pathlib import Path
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(BASE_DIR, "data")
-DASHBOARD_DIR = os.path.join(BASE_DIR, "dashboard")
+BASE_DIR = Path(__file__).resolve().parent
 
-CSV_FILE = os.path.join(DATA_DIR, "emails.csv")
-JSON_FILE = os.path.join(DATA_DIR, "emails.json")
-DASHBOARD_DATA_FILE = os.path.join(DASHBOARD_DIR, "data.json")
+DATA_DIR = BASE_DIR / "data"
+SCRAPER_DIR = BASE_DIR / "scraper"
 
-REQUEST_TIMEOUT = 15
-MAX_RETRIES = 2
-CONCURRENT_WORKERS = 10
+# Write to root directory as well for the website
+ROOT_DATA_FILE = BASE_DIR / "data.json"
+ROOT_DOMAINS_FILE = BASE_DIR / "domains.json"
 
-USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-
-HEADERS = {
-    "User-Agent": USER_AGENT,
-    "Accept": "application/json, text/html, */*",
-    "Accept-Language": "en-US,en;q=0.9",
-}
+DATA_DIR.mkdir(exist_ok=True)
